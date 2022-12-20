@@ -46,7 +46,7 @@ class Trie:
         for child in node.children.values():
             self.dfs(child, prefix + node.char)
 
-    def search(self, x):
+    def query(self, x):
 
         self.output = []
         node = self.root
@@ -59,4 +59,5 @@ class Trie:
 
         self.dfs(node, x[:-1])
 
-        return self.output
+        # to be stored in alphabetical order
+        return sorted(self.output)
