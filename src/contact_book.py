@@ -1,4 +1,4 @@
-from src.trie import *
+from src.trie import Trie
 
 
 class ContactBook():
@@ -19,7 +19,7 @@ class ContactBook():
         if (name not in self.trie.query("")):
             self.trie.insert(name)
             self.contacts[len(self.trie.query("")) - 1] = {"name": name,
-                                                            "phone_number": phone_number}
+                                                           "phone_number": phone_number}
 
         else:
             raise Exception(f"Failed to add contact. {name} already exists.")
@@ -40,6 +40,32 @@ class ContactBook():
                 temp_dict[key-1] = value
             else:
                 continue
+
+        self.contacts = temp_dict
+
+    def get_ordered_contacts(self):
+        temp_dict = {}
+
+        # getting the keys from nested dict in the alphabetical order of names
+        sorted_keys = [key for key in dict(
+            sorted(self.contacts.items(), key=lambda x: x[1]["name"]))]
+
+        for i in range(len(self.trie.query(""))):
+            temp_dict[i] = {"name": self.contacts.get(sorted_keys[i]).get("name"),
+                            "phone_number": self.contacts.get(sorted_keys[i]).get("phone_number")}
+
+        self.contacts = temp_dict
+
+    def get_contacts_by_search(self, search_input):
+
+        temp_dict = {}
+        list_of_names = self.trie.query(search_input)
+
+        for i in range(len(list_of_names)):
+            for contact in self.contacts.values():
+                if list_of_names[i] == contact["name"]:
+                    temp_dict[i] = {"name": contact["name"],
+                                    "phone_number": contact["phone_number"]}
 
         self.contacts = temp_dict
 
