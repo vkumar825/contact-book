@@ -6,6 +6,7 @@ class ContactBook():
     def __init__(self):
         self.trie = Trie()
         self.contacts = {}
+        self.search_result = {}
 
     def add_contact(self, name, phone_number):
 
@@ -25,6 +26,7 @@ class ContactBook():
             raise Exception(f"Failed to add contact. {name} already exists.")
 
     def remove_contact(self, name):
+
         temp_dict = {}
 
         for key in self.contacts.keys():
@@ -44,6 +46,7 @@ class ContactBook():
         self.contacts = temp_dict
 
     def get_ordered_contacts(self):
+
         temp_dict = {}
 
         # getting the keys from nested dict in the alphabetical order of names
@@ -58,19 +61,25 @@ class ContactBook():
 
     def get_contacts_by_search(self, search_input):
 
-        temp_dict = {}
+        if (len(search_input) == 0):
+            self.get_ordered_contacts()
+
+        search_dict = {}
         list_of_names = self.trie.query(search_input)
 
         for i in range(len(list_of_names)):
             for contact in self.contacts.values():
                 if list_of_names[i] == contact["name"]:
-                    temp_dict[i] = {"name": contact["name"],
+                    search_dict[i] = {"name": contact["name"],
                                     "phone_number": contact["phone_number"]}
 
-        self.contacts = temp_dict
+        self.search_result = search_dict
+
+    def get_trie(self):
+        return self.trie
 
     def get_contacts(self):
         return self.contacts
 
-    def get_trie(self):
-        return self.trie
+    def get_search_result(self):
+        return self.search_result
