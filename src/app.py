@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from contact_book import ContactBook
 
 class Application(tk.Tk):
 	
@@ -92,35 +93,138 @@ class ContactBookPage(tk.Frame):
 	def __init__(self, parent, controller):
 		tk.Frame.__init__(self, parent)
 
-		search_str = tk.StringVar()
-		search = tk.Entry(self, textvariable=search_str, width=30)
-		search.grid(row=0, column=0, padx=10, pady=10)
+		self.cbook = ContactBook()
+		# self.label_list = []
 
-		search_btn = tk.Button(self, text="Search")
-		search_btn.grid(row=0, column=10)
+		self.search_str = tk.StringVar()
+		self.search_entry = tk.Entry(self, textvariable=self.search_str, width=30)
+		self.search_entry.grid(row=0, column=0, padx=10, pady=10)
 
-		add_btn = tk.Button(self, text="+")
-		add_btn.grid(row=0, column=11)
+		self.search_btn = tk.Button(self, text="Search", command=self.search)
+		self.search_btn.grid(row=0, column=10)
 
-		remove_btn = tk.Button(self, text="-")
-		remove_btn.grid(row=0, column=12)
+		self.add_btn = tk.Button(self, text="+", command=self.add)
+		self.add_btn.grid(row=0, column=11)
 
-		contacts_list = tk.Listbox(self, height=15, width=30)
-		contacts_list.place(relx=0.025, rely=0.150)
+		self.remove_btn = tk.Button(self, text="-", command=self.remove)
+		self.remove_btn.grid(row=0, column=12)
 
-		placeholder_name = tk.Label(self, text ="John Doe",font=("Arial", 25))
-		placeholder_name.place(relx=0.75, rely=0.19, anchor="center")
+		self.contacts_list = tk.Listbox(self, height=15, width=30)
+		self.contacts_list.place(relx=0.025, rely=0.150)
 
-		email = "doe@mail.com"
-		phone_num = "741-283-1922"
+		self.contacts_list.bind('<<ListboxSelect>>', lambda e: self.get_info())
 
-		info_box = tk.Text(self, height=10, width=30)
-		info_box.insert(tk.INSERT, "Email: ", "")
-		info_box.insert(tk.END, email + "\n")
-		info_box.insert(tk.INSERT, "Phone Number: ", "")
-		info_box.insert(tk.END, phone_num + "\n")
-		info_box.config(state="disabled")
-		info_box.place(relx=0.75, rely=0.45, anchor="center")
+
+	def search(self):
+		search_term = self.search_str.get()
+		print(search_term)
+		self.cbook.get_contacts_by_search(search_term)
+
+		self.contacts_list.delete(0, tk.END)
+
+		for i in range(len(self.cbook.get_trie().query(search_term))):
+			self.contacts_list.insert(i, self.cbook.get_search_result().get(i).get("name"))
+
+
+	def add(self):
+		self.win = tk.Toplevel()
+		self.win.title("Add Contact")
+		self.win.geometry("300x300")
+		self.win.anchor("center")
+
+		self.name_label = tk.Label(self.win, text="Name")
+		self.name_label.grid(row=0, column=0)
+		self.name_str = tk.StringVar()
+		self.name_entry = tk.Entry(self.win, textvariable=self.name_str)
+		self.name_entry.grid(row=1, column=0)
+
+		self.phone_label = tk.Label(self.win, text="Phone Number")
+		self.phone_label.grid(row=2, column=0)
+		self.phone_str = tk.StringVar()
+		self.phone_entry = tk.Entry(self.win, textvariable=self.phone_str)
+		self.phone_entry.grid(row=3, column=0)
+
+		close_btn = ttk.Button(self.win, text="Add", command=self.close_add)
+		close_btn.grid(row=4, column=0)
+
+	def close_add(self):
+		print(f"added {self.name_str.get()} with phone number {self.phone_str.get()}")
+		self.cbook.add_contact(self.name_str.get(), self.phone_str.get())
+		self.update_list()
+		self.win.destroy()
+
+	def remove(self):
+		# self.win = tk.Toplevel()
+		# self.win.title("Add Contact")
+		# self.win.geometry("300x300")
+		# self.win.anchor("center")
+
+		self.cbook.get_ordered_contacts()
+		ordered_contacts = self.cbook.get_contacts()
+
+		# self.name_label = tk.Label(self.win, text="Name")
+		# self.name_label.grid(row=0, column=0)
+		# self.name_str = tk.StringVar()
+		# self.name_entry = tk.Entry(self.win, textvariable=self.name_str)
+		# self.name_entry.grid(row=1, column=0)
+
+		for key in self.contacts_list.curselection():
+			self.name_to_remove = ordered_contacts.get(key).get("name")
+
+		print(f"name to remove: {self.name_to_remove}")
+		self.close_remove()
+
+	def close_remove(self):
+		print(f"removed {self.name_to_remove}")
+		self.cbook.remove_contact(self.name_to_remove)
+		self.update_list()
+		# self.win.destroy()
+		self.info_box.destroy()
+
+	def update_list(self):
+		self.contacts_list.delete(0, tk.END)
+
+		if (len(self.cbook.get_contacts()) > 0):
+			self.cbook.get_ordered_contacts()
+			for i in range(len(self.cbook.get_trie().query(""))):
+				self.contacts_list.insert(i, self.cbook.get_contacts().get(i).get("name"))
+
+	def get_info(self):
+
+		self.cbook.get_ordered_contacts()
+		ordered_contacts = self.cbook.get_contacts()
+
+		for key in self.contacts_list.curselection():
+			name = ordered_contacts.get(key).get("name")
+			phone_num = ordered_contacts.get(key).get("phone_number")
+
+		# NOTE: Need to figure out a way to remove previous label when different name is clicked
+
+		# self.label_list.append(name)
+		# print(f'Label List: {self.label_list}')
+
+		# if (len(self.label_list)) > 1:
+		# 	self.label_list.pop(0)
+		# 	self.name_label.destroy
+
+		# print(f'Label List Now: {self.label_list}')
+		# self.name_label = tk.Label(self,font=("Arial", 25))
+		# self.name_label.config(text=self.label_list[0])
+		# self.name_label.place(relx=0.75, rely=0.19, anchor="center")
+
+
+		# NOTE: Similar issue to label above, the textbox stacks upon old ones based on contact chosen
+
+		self.info_box = tk.Text(self, height=10, width=30)
+
+		self.info_box.insert(tk.INSERT, "Name: ", "")
+		self.info_box.insert(tk.END, name + "\n")
+		self.info_box.insert(tk.INSERT, "Phone Number: ", "")
+		self.info_box.insert(tk.END, phone_num + "\n")
+
+		self.info_box.config(state="disabled")
+		self.info_box.place(relx=0.75, rely=0.35, anchor="center")
+
 
 		
 
