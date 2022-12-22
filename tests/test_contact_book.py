@@ -1,4 +1,6 @@
 import unittest
+
+# need to uncomment line 2 in contact_book.py to run the tests below
 from src.contact_book import ContactBook
 
 
