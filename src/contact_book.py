@@ -67,13 +67,16 @@ class ContactBook():
         search_dict = {}
         list_of_names = self.trie.query(search_input)
 
-        for i in range(len(list_of_names)):
-            for contact in self.contacts.values():
-                if list_of_names[i] == contact["name"]:
-                    search_dict[i] = {"name": contact["name"],
-                                    "phone_number": contact["phone_number"]}
+        if (len(list_of_names) > 0):
+            for i in range(len(list_of_names)):
+                for contact in self.contacts.values():
+                    if list_of_names[i] == contact["name"]:
+                        search_dict[i] = {"name": contact["name"],
+                                          "phone_number": contact["phone_number"]}
+            self.search_result = search_dict
 
-        self.search_result = search_dict
+        else:
+            self.search_result = search_dict
 
     def get_trie(self):
         return self.trie
