@@ -67,7 +67,9 @@ class Test_ContactBook(unittest.TestCase):
                 list_of_ordered_names[i], cb.get_contacts().get(i).get('name'))
 
     def test_get_contacts_by_search(self):
+
         cb = ContactBook()
+
         cb.add_contact("Bob Smith", "123-324-8729")
         cb.add_contact("Michael Jackson", "182-262-1965")
         cb.add_contact("Mike Schmidt", "182-265-1983")
@@ -84,11 +86,39 @@ class Test_ContactBook(unittest.TestCase):
         self.assertEqual(12, len(cb.get_contacts()))
 
         cb.get_contacts_by_search("M")
-        self.assertEqual(9, len(cb.get_contacts()))
+        self.assertEqual(9, len(cb.get_search_result()))
         self.assertEqual(9, len(cb.get_trie().query("M")))
 
         list_of_ordered_names = cb.get_trie().query("M")
 
         for i in range(len(list_of_ordered_names)):
             self.assertEqual(
+                list_of_ordered_names[i], cb.get_search_result().get(i).get('name'))
+
+        # searching for all should return back 12 contacts
+        cb.get_contacts_by_search("")
+        self.assertEqual(12, len(cb.get_contacts()))
+        list_of_ordered_names = cb.get_trie().query("")
+
+        # both get_search_result and get_contacts should be the same 
+        for i in range(len(list_of_ordered_names)):
+            self.assertEqual(
+                list_of_ordered_names[i], cb.get_search_result().get(i).get('name'))
+            self.assertEqual(
                 list_of_ordered_names[i], cb.get_contacts().get(i).get('name'))
+
+
+        cb.get_contacts_by_search("Ma")
+        self.assertEqual(3, len(cb.get_search_result()))
+        self.assertEqual(3, len(cb.get_trie().query("Ma")))
+        self.assertEqual(12, len(cb.get_contacts()))
+
+        list_of_ordered_names = cb.get_trie().query("Ma")
+        for i in range(len(list_of_ordered_names)):
+            self.assertEqual(
+                list_of_ordered_names[i], cb.get_search_result().get(i).get('name'))
+
+
+        # searching for contact that doesn't exist yields 0 result
+        cb.get_contacts_by_search("Y")
+        self.assertEqual(0, len(cb.get_search_result()))
