@@ -1,8 +1,8 @@
 # for unit testing
-from src.trie import Trie
+# from src.trie import Trie
 
 # for tkinter app
-# from trie import Trie
+from trie import Trie
 
 
 class ContactBook():
