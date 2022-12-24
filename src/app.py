@@ -101,6 +101,7 @@ class ContactBookPage(tk.Frame):
 		self.search_str = tk.StringVar()
 		self.search_entry = tk.Entry(self, textvariable=self.search_str, width=30)
 		self.search_entry.grid(row=0, column=0, padx=10, pady=10)
+		self.has_searched = False
 
 		self.search_btn = tk.Button(self, text="Search", command=self.search)
 		self.search_btn.grid(row=0, column=10)
@@ -121,12 +122,18 @@ class ContactBookPage(tk.Frame):
 		search_term = self.search_str.get()
 		print(search_term)
 
-		self.cbook.get_contacts_by_search(search_term)
+		if len(search_term) > 0:
+			self.has_searched = True
+		else: 
+			self.has_searched = False
 
+		self.cbook.get_contacts_by_search(search_term)
 		self.contacts_list.delete(0, tk.END)
 
 		for i in range(len(self.cbook.get_trie().query(search_term))):
 			self.contacts_list.insert(i, self.cbook.get_search_result().get(i).get("name"))
+
+		print(f"Has Searched: {self.has_searched}")
 
 
 	def add(self):
@@ -157,23 +164,30 @@ class ContactBookPage(tk.Frame):
 		self.win.destroy()
 
 	def remove(self):
-		self.cbook.get_ordered_contacts()
-		ordered_contacts = self.cbook.get_contacts()
+		if self.contacts_list.curselection():
 
-		for key in self.contacts_list.curselection():
-			self.name_to_remove = ordered_contacts.get(key).get("name")
+			if self.has_searched:
+				ordered_contacts = self.cbook.get_search_result()
+			else:
+				self.cbook.get_ordered_contacts()
+				ordered_contacts = self.cbook.get_contacts()
 
-		print(f"name to remove: {self.name_to_remove}")
-		self.close_remove()
+			for key in self.contacts_list.curselection():
+				self.name_to_remove = ordered_contacts.get(key).get("name")
+
+			self.close_remove()
+
+		else:
+			print("Need to select before removing")
 
 	def close_remove(self):
-		print(f"removed {self.name_to_remove}")
 		self.cbook.remove_contact(self.name_to_remove)
 		self.update_list()
 
 		# reset display label & hide info box for that contact when they are removed
 		self.display_label.config(text="")
 		self.info_box.place_forget()
+
 
 	def update_list(self):
 		self.contacts_list.delete(0, tk.END)
@@ -184,12 +198,12 @@ class ContactBookPage(tk.Frame):
 				self.contacts_list.insert(i, self.cbook.get_contacts().get(i).get("name"))
 
 	def get_info(self):
-		
-		self.info_box.config(state="normal")
-		self.info_box.delete("1.0", tk.END)
 
-		self.cbook.get_ordered_contacts()
-		ordered_contacts = self.cbook.get_contacts()
+		if self.has_searched:
+				ordered_contacts = self.cbook.get_search_result()
+		else:
+			self.cbook.get_ordered_contacts()
+			ordered_contacts = self.cbook.get_contacts()
 
 		for key in self.contacts_list.curselection():
 			name = ordered_contacts.get(key).get("name")
@@ -210,7 +224,6 @@ class ContactBookPage(tk.Frame):
 		self.info_box.config(state="disabled")
 
 
-	
 if __name__ == "__main__":
     app = Application()
     app.title("Contact Book")
