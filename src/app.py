@@ -94,7 +94,9 @@ class ContactBookPage(tk.Frame):
 		tk.Frame.__init__(self, parent)
 
 		self.cbook = ContactBook()
-		# self.label_list = []
+		self.display_label = tk.Label(self,font=("Arial", 25))
+		self.display_label.place(relx=0.75, rely=0.19, anchor="center")
+		self.info_box = tk.Text(self, height=15, width=40)
 
 		self.search_str = tk.StringVar()
 		self.search_entry = tk.Entry(self, textvariable=self.search_str, width=30)
@@ -118,6 +120,7 @@ class ContactBookPage(tk.Frame):
 	def search(self):
 		search_term = self.search_str.get()
 		print(search_term)
+
 		self.cbook.get_contacts_by_search(search_term)
 
 		self.contacts_list.delete(0, tk.END)
@@ -154,19 +157,8 @@ class ContactBookPage(tk.Frame):
 		self.win.destroy()
 
 	def remove(self):
-		# self.win = tk.Toplevel()
-		# self.win.title("Add Contact")
-		# self.win.geometry("300x300")
-		# self.win.anchor("center")
-
 		self.cbook.get_ordered_contacts()
 		ordered_contacts = self.cbook.get_contacts()
-
-		# self.name_label = tk.Label(self.win, text="Name")
-		# self.name_label.grid(row=0, column=0)
-		# self.name_str = tk.StringVar()
-		# self.name_entry = tk.Entry(self.win, textvariable=self.name_str)
-		# self.name_entry.grid(row=1, column=0)
 
 		for key in self.contacts_list.curselection():
 			self.name_to_remove = ordered_contacts.get(key).get("name")
@@ -178,8 +170,10 @@ class ContactBookPage(tk.Frame):
 		print(f"removed {self.name_to_remove}")
 		self.cbook.remove_contact(self.name_to_remove)
 		self.update_list()
-		# self.win.destroy()
-		self.info_box.destroy()
+
+		# reset display label & hide info box for that contact when they are removed
+		self.display_label.config(text="")
+		self.info_box.place_forget()
 
 	def update_list(self):
 		self.contacts_list.delete(0, tk.END)
@@ -190,6 +184,9 @@ class ContactBookPage(tk.Frame):
 				self.contacts_list.insert(i, self.cbook.get_contacts().get(i).get("name"))
 
 	def get_info(self):
+		
+		self.info_box.config(state="normal")
+		self.info_box.delete("1.0", tk.END)
 
 		self.cbook.get_ordered_contacts()
 		ordered_contacts = self.cbook.get_contacts()
@@ -198,36 +195,22 @@ class ContactBookPage(tk.Frame):
 			name = ordered_contacts.get(key).get("name")
 			phone_num = ordered_contacts.get(key).get("phone_number")
 
-		# NOTE: Need to figure out a way to remove previous label when different name is clicked
+		# update display label for that contact name
+		self.display_label.config(text=name)
 
-		# self.label_list.append(name)
-		# print(f'Label List: {self.label_list}')
+		# clear previous contact info before displaying the current info
+		self.info_box.config(state="normal")
+		self.info_box.delete("1.0", tk.END)
 
-		# if (len(self.label_list)) > 1:
-		# 	self.label_list.pop(0)
-		# 	self.name_label.destroy
-
-		# print(f'Label List Now: {self.label_list}')
-		# self.name_label = tk.Label(self,font=("Arial", 25))
-		# self.name_label.config(text=self.label_list[0])
-		# self.name_label.place(relx=0.75, rely=0.19, anchor="center")
-
-
-		# NOTE: Similar issue to label above, the textbox stacks upon old ones based on contact chosen
-
-		self.info_box = tk.Text(self, height=10, width=30)
-
+		self.info_box.place(relx=0.73, rely=0.59, anchor="center")
 		self.info_box.insert(tk.INSERT, "Name: ", "")
 		self.info_box.insert(tk.END, name + "\n")
 		self.info_box.insert(tk.INSERT, "Phone Number: ", "")
 		self.info_box.insert(tk.END, phone_num + "\n")
-
 		self.info_box.config(state="disabled")
-		self.info_box.place(relx=0.75, rely=0.35, anchor="center")
 
 
-		
-
+	
 if __name__ == "__main__":
     app = Application()
     app.title("Contact Book")
