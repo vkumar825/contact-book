@@ -51,7 +51,8 @@ class StartPage(tk.Frame):
         self.password_str = tk.StringVar()
         password_label = tk.Label(self, text="Password: ")
         password_label.place(relx=0.28, rely=0.4, anchor="center")
-        self.password_entry = tk.Entry(self, textvariable=self.password_str, show="*")
+        self.password_entry = tk.Entry(
+            self, textvariable=self.password_str, show="*")
         self.password_entry.place(relx=0.5, rely=0.4, anchor="center")
 
         login_button = ttk.Button(self, text="Login",
@@ -102,7 +103,8 @@ class RegisterPage(tk.Frame):
         self.password_str = tk.StringVar()
         password_label = tk.Label(self, text="Password: ")
         password_label.place(relx=0.28, rely=0.4, anchor="center")
-        self.password_entry = tk.Entry(self, textvariable=self.password_str, show="*")
+        self.password_entry = tk.Entry(
+            self, textvariable=self.password_str, show="*")
         self.password_entry.place(relx=0.5, rely=0.4, anchor="center")
 
         self.confirm_str = tk.StringVar()
@@ -123,8 +125,6 @@ class RegisterPage(tk.Frame):
         if (self.confirm_str.get() == self.password_str.get()):
             db.create_user(self.email_str.get(), self.password_str.get())
             print("Successfully created account!")
-            # self.email_entry.delete(0, tk.END)
-            # self.password_entry.delete(0, tk.END)
             self.controller.show_frame(StartPage)
         else:
             print("Passwords do not match. Please try again.")
@@ -271,10 +271,7 @@ class ContactBookPage(tk.Frame):
             self.info_box.config(state="disabled")
 
     def logout(self):
-        trie_length = len(cbook.get_trie().query(""))
-        print(f"before logout: {trie_length}")
         cbook.remove_all_contacts()
-        print(f"after logout :{trie_length}")
         self.controller.show_frame(StartPage)
 
 
