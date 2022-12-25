@@ -41,32 +41,19 @@ class Test_ContactBook(unittest.TestCase):
         self.assertEqual(3, len(cb.get_trie().query("M")))
 
         cb.remove_contact("Michael Afton")
-
         self.assertEqual(5, len(cb.get_contacts()))
         self.assertEqual(2, len(cb.get_trie().query("M")))
 
-    def test_get_ordered_contacts(self):
 
-        cb = ContactBook()
+        self.assertEqual(1, len(cb.get_trie().query("J")))
+        cb.remove_contact("James Bond")
+        self.assertEqual(4, len(cb.get_contacts()))
+        self.assertEqual(0, len(cb.get_trie().query("J")))
 
-        cb.add_contact("Bob Smith", "123-324-8729")
-        cb.add_contact("Michael Jackson", "182-262-1965")
-        cb.add_contact("Mike Schmidt", "182-265-1983")
-        cb.add_contact("Michael Afton", "189-223-1983")
-        cb.add_contact("Robert De Niro", "872-233-1873")
-        cb.add_contact("James Bond", "672-334-1007")
-
-        self.assertEqual(6, len(cb.get_contacts()))
-        cb.get_ordered_contacts()
-        self.assertEqual(6, len(cb.get_contacts()))
-        self.assertEqual(6, len(cb.get_trie().query("")))
-
-        list_of_ordered_names = cb.get_trie().query("")
-
-        # index of the list should match the contacts dict key
-        for i in range(len(list_of_ordered_names)):
-            self.assertEqual(
-                list_of_ordered_names[i], cb.get_contacts().get(i).get('name'))
+        # attempting to remove non-existent name
+        self.assertEqual(0, len(cb.get_trie().query("H")))
+        with self.assertRaises(Exception):
+            cb.remove_contact("Harry Styles")
 
     def test_get_contacts_by_search(self):
 
@@ -92,10 +79,10 @@ class Test_ContactBook(unittest.TestCase):
         self.assertEqual(9, len(cb.get_trie().query("M")))
 
         list_of_ordered_names = cb.get_trie().query("M")
-
+        
         for i in range(len(list_of_ordered_names)):
             self.assertEqual(
-                list_of_ordered_names[i], cb.get_search_result().get(i).get('name'))
+                list_of_ordered_names[i], cb.get_search_result()[i].get('name'))
 
         # searching for all should return back 12 contacts
         cb.get_contacts_by_search("")
@@ -105,10 +92,9 @@ class Test_ContactBook(unittest.TestCase):
         # both get_search_result and get_contacts should be the same 
         for i in range(len(list_of_ordered_names)):
             self.assertEqual(
-                list_of_ordered_names[i], cb.get_search_result().get(i).get('name'))
+                list_of_ordered_names[i], cb.get_search_result()[i].get('name'))
             self.assertEqual(
-                list_of_ordered_names[i], cb.get_contacts().get(i).get('name'))
-
+                list_of_ordered_names[i], cb.get_contacts()[i].get('name'))
 
         cb.get_contacts_by_search("Ma")
         self.assertEqual(3, len(cb.get_search_result()))
@@ -118,8 +104,7 @@ class Test_ContactBook(unittest.TestCase):
         list_of_ordered_names = cb.get_trie().query("Ma")
         for i in range(len(list_of_ordered_names)):
             self.assertEqual(
-                list_of_ordered_names[i], cb.get_search_result().get(i).get('name'))
-
+                list_of_ordered_names[i], cb.get_search_result()[i].get('name'))
 
         # searching for contact that doesn't exist yields 0 result
         cb.get_contacts_by_search("Y")
