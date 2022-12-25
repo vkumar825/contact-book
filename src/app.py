@@ -48,10 +48,10 @@ class StartPage(tk.Frame):
         self.email_entry = tk.Entry(self, textvariable=self.email_str)
         self.email_entry.place(relx=0.5, rely=0.3, anchor="center")
 
-        self.login_password = tk.StringVar()
+        self.password_str = tk.StringVar()
         password_label = tk.Label(self, text="Password: ")
         password_label.place(relx=0.28, rely=0.4, anchor="center")
-        self.password_entry = tk.Entry(self, textvariable=self.login_password)
+        self.password_entry = tk.Entry(self, textvariable=self.password_str, show="*")
         self.password_entry.place(relx=0.5, rely=0.4, anchor="center")
 
         login_button = ttk.Button(self, text="Login",
@@ -64,7 +64,7 @@ class StartPage(tk.Frame):
 
     def verify_user(self):
 
-        if (db.contains_user(self.email_str.get(), self.login_password.get())):
+        if (db.contains_user(self.email_str.get(), self.password_str.get())):
             print("Successfully logged in!")
             contacts_list = db.fetch(self.email_str.get())
             if len(contacts_list) > 0:
@@ -102,13 +102,13 @@ class RegisterPage(tk.Frame):
         self.password_str = tk.StringVar()
         password_label = tk.Label(self, text="Password: ")
         password_label.place(relx=0.28, rely=0.4, anchor="center")
-        self.password_entry = tk.Entry(self, textvariable=self.password_str)
+        self.password_entry = tk.Entry(self, textvariable=self.password_str, show="*")
         self.password_entry.place(relx=0.5, rely=0.4, anchor="center")
 
         self.confirm_str = tk.StringVar()
         confirm_label = tk.Label(self, text="Confirm Password: ")
         confirm_label.place(relx=0.24, rely=0.5, anchor="center")
-        confirm_entry = tk.Entry(self, textvariable=self.confirm_str)
+        confirm_entry = tk.Entry(self, textvariable=self.confirm_str, show="*")
         confirm_entry.place(relx=0.5, rely=0.5, anchor="center")
 
         create_button = ttk.Button(
