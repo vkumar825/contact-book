@@ -9,7 +9,6 @@ class ContactBook():
 
     def __init__(self):
 
-        # TODO: Use a list of dictionary instead of nested dict for mongodb
         self.trie = Trie()
         self.contacts = []
         self.search_result = []
@@ -42,6 +41,14 @@ class ContactBook():
             if list_of_names[i] == name:
                 self.contacts.pop(i)
                 self.trie.delete(name)
+
+    def remove_all_contacts(self):
+        list_of_names = [d["name"] for d in self.contacts]
+        for i in range(len(list_of_names)):
+            self.trie.delete(list_of_names[i])
+
+        self.contacts.clear()
+        self.search_result.clear()
 
     def get_contacts_by_search(self, search_input):
 
